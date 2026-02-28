@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef, RefObject } from 'react';
+import { useState, useRef, RefObject, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, X } from 'lucide-react';
 
@@ -21,9 +21,15 @@ export default function App() {
 
   // Animation trigger for Section 2
   const handleSection2InView = () => {
-    if (hasAnimated) return;
-    setHasAnimated(true);
-    
+    if (!hasAnimated) {
+      setHasAnimated(true);
+    }
+  };
+
+  // Effect for animation logic
+  useEffect(() => {
+    if (!hasAnimated) return;
+
     // Animate numbers from 200 to 500 over 3 seconds
     const duration = 3000;
     const start = 200;
@@ -46,7 +52,9 @@ export default function App() {
         }, 1000);
       }
     }, 16);
-  };
+
+    return () => clearInterval(timer);
+  }, [hasAnimated]);
 
   return (
     <div className="min-h-screen bg-bg-cream text-stone-700 selection:bg-sage-green selection:text-white">
@@ -93,7 +101,7 @@ export default function App() {
       >
         <motion.div
           onViewportEnter={handleSection2InView}
-          viewport={{ amount: 0.6, once: true }}
+          viewport={{ amount: 0.3, once: true }}
           className="relative flex flex-col items-center"
         >
           {/* Text above animation */}
