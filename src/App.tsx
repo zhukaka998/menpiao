@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, RefObject, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useInView } from 'motion/react';
 import { ChevronDown, X } from 'lucide-react';
 
 export default function App() {
@@ -13,20 +13,22 @@ export default function App() {
   const section2Ref = useRef<HTMLDivElement>(null);
   const section3Ref = useRef<HTMLDivElement>(null);
   const [hasAnimated, setHasAnimated] = useState(false);
+  
+  // Use useInView hook for reliable triggering
+  const isInView = useInView(section2Ref, { amount: 0.3, once: true });
 
   // Scroll to next section handler
   const scrollToSection = (ref: RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Animation trigger for Section 2
-  const handleSection2InView = () => {
-    if (!hasAnimated) {
+  // Effect for animation logic
+  useEffect(() => {
+    if (isInView && !hasAnimated) {
       setHasAnimated(true);
     }
-  };
+  }, [isInView, hasAnimated]);
 
-  // Effect for animation logic
   useEffect(() => {
     if (!hasAnimated) return;
 
@@ -71,7 +73,7 @@ export default function App() {
           className="relative z-10 max-w-2xl text-center space-y-12"
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-wide leading-tight text-stone-800">
-            在喧嚣的年岁，<br />
+            在喧嚣的色界，<br />
             <span className="italic text-sage-green">唤醒完整的自己。</span>
           </h1>
           
@@ -100,8 +102,6 @@ export default function App() {
         className="h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden"
       >
         <motion.div
-          onViewportEnter={handleSection2InView}
-          viewport={{ amount: 0.3, once: true }}
           className="relative flex flex-col items-center"
         >
           {/* Text above animation */}
@@ -229,7 +229,7 @@ export default function App() {
               </motion.button>
               
               <p className="text-xs text-stone-400">
-                价值 980 元 · 限时 39 元领取
+                价值 980 元 · 限时 5.2 元领取
               </p>
             </div>
           </motion.div>
