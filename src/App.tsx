@@ -3,60 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef, RefObject, useEffect } from 'react';
-import { motion, AnimatePresence, useInView } from 'motion/react';
+import { useState, useRef, RefObject } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, X } from 'lucide-react';
 
 export default function App() {
   const [showModal, setShowModal] = useState(false);
-  const [energyLevel, setEnergyLevel] = useState(200);
-  const section2Ref = useRef<HTMLDivElement>(null);
   const section3Ref = useRef<HTMLDivElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  
-  // Use useInView hook for reliable triggering
-  const isInView = useInView(section2Ref, { amount: 0.3, once: true });
 
   // Scroll to next section handler
   const scrollToSection = (ref: RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  // Effect for animation logic
-  useEffect(() => {
-    if (isInView && !hasAnimated) {
-      setHasAnimated(true);
-    }
-  }, [isInView, hasAnimated]);
-
-  useEffect(() => {
-    if (!hasAnimated) return;
-
-    // Animate numbers from 200 to 500 over 3 seconds
-    const duration = 3000;
-    const start = 200;
-    const end = 500; // Love
-    const startTime = Date.now();
-
-    const timer = setInterval(() => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      // Ease out cubic
-      const ease = 1 - Math.pow(1 - progress, 3);
-      
-      setEnergyLevel(Math.floor(start + (end - start) * ease));
-
-      if (progress >= 1) {
-        clearInterval(timer);
-        // Wait a moment then scroll to section 3
-        setTimeout(() => {
-          scrollToSection(section3Ref);
-        }, 1000);
-      }
-    }, 16);
-
-    return () => clearInterval(timer);
-  }, [hasAnimated]);
 
   return (
     <div className="min-h-screen bg-bg-cream text-stone-700 selection:bg-sage-green selection:text-white">
@@ -89,89 +47,9 @@ export default function App() {
           className="absolute bottom-12 cursor-pointer z-10"
           animate={{ y: [0, 10, 0], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          onClick={() => scrollToSection(section2Ref)}
+          onClick={() => scrollToSection(section3Ref)}
         >
           <ChevronDown className="w-8 h-8 text-stone-400" />
-        </motion.div>
-      </section>
-
-
-      {/* --- Section 2: Awakening Animation --- */}
-      <section 
-        ref={section2Ref}
-        className="h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden"
-      >
-        <motion.div
-          className="relative flex flex-col items-center"
-        >
-          {/* Text above animation */}
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={hasAnimated ? { opacity: 1 } : {}}
-            transition={{ duration: 1 }}
-            className="mb-12 text-stone-500 tracking-widest text-sm uppercase"
-          >
-            正在为您链接同频能量...
-          </motion.p>
-
-          {/* Meditating Figure (SVG) */}
-          <div className="relative w-64 h-64 flex items-center justify-center">
-            {/* Aura Rings */}
-            {[1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                className="absolute inset-0 rounded-full border border-sage-green/30"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={hasAnimated ? { 
-                  scale: [0.8, 1.5 + i * 0.3], 
-                  opacity: [0, 0.5, 0] 
-                } : {}}
-                transition={{ 
-                  duration: 3, 
-                  repeat: hasAnimated ? Infinity : 0, 
-                  delay: i * 0.5,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-
-            {/* Simple Line Art Figure */}
-            <svg viewBox="0 0 100 100" className="w-32 h-32 text-stone-700 z-10">
-              <path 
-                d="M50 20 C50 15, 55 15, 55 20 C55 25, 45 25, 45 20 C45 15, 50 15, 50 20 Z" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1.5"
-              />
-              <path 
-                d="M50 25 L50 50 M50 50 L30 70 M50 50 L70 70 M30 70 L40 80 M70 70 L60 80" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              {/* Lotus position legs simplified */}
-              <path 
-                d="M30 70 Q20 75, 35 85 M70 70 Q80 75, 65 85" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-            
-            {/* Energy Level Number */}
-            <motion.div 
-              className="absolute -top-8 font-serif text-3xl text-amber-gold"
-              initial={{ opacity: 0, y: 10 }}
-              animate={hasAnimated ? { opacity: 1, y: -20 } : {}}
-              transition={{ duration: 1 }}
-            >
-              {energyLevel} <span className="text-sm text-stone-400 ml-1">
-                {energyLevel < 300 ? '(勇气)' : energyLevel < 500 ? '(主动)' : '(爱)'}
-              </span>
-            </motion.div>
-          </div>
         </motion.div>
       </section>
 
